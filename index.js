@@ -1,12 +1,4 @@
-function shuffle(array) {
-    for (let i = array.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
-    }
-    return array;
-}
-
-var word_pairs = {
+var word_pairs_json = {
     "words": [
         ["Sun", "Moon"],
         ["Love", "Hate"],
@@ -19,7 +11,33 @@ var word_pairs = {
     ]
 };
 
-var words = shuffle(word_pairs.words.flat());
+var word_pairs = word_pairs_json.words;
+
+console.log(word_pairs);
+console.log(word_pairs.includes(["Heart", "Beat"]));
+
+
+function PairExist(pair, pair_list) {
+    pair_list.forEach(words => {
+        if ((words[0] === pair[0] && words[1] === pair[1]) || (words[0] === pair[1] && words[1] === pair[0])) return true;
+    });
+    return false;
+}
+
+
+
+function shuffle(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+}
+
+
+
+var words = shuffle(word_pairs.flat());
+var word_pair = [];
 
 
 words.forEach(word => {
@@ -54,8 +72,20 @@ function createCard(word) {
 
 
 function flipCard(card) {
-    card.classList.toggle("flip");
+    if (card.classList.toggle("flip")) {
+        if (word_pair.length == 2) {
+            let pp = [word_pair[1], word_pair[0]];
+            if (word_pairs.includes(word_pair) || word_pairs.includes(pp)) {
+                console.log("Found");
+            }
+        } else {
+            word_pair.push(card.word);
+        }
+    } else {
+        word_pair = word_pair.filter(word => word !== card.word);
+    }
     console.log(card.word);
+    console.log(word_pair);
 }
 
 document.addEventListener('DOMContentLoaded', function () {
