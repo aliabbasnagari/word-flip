@@ -1,3 +1,10 @@
+function shuffle(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+}
 
 var word_pairs = {
     "words": [
@@ -12,10 +19,11 @@ var word_pairs = {
     ]
 };
 
+var words = shuffle(word_pairs.words.flat());
 
-word_pairs["words"].forEach(word => {
-    createCard(word[0]);
-    createCard(word[1]);
+
+words.forEach(word => {
+    createCard(word);
 });
 
 // JavaScript code to create and insert the card element
@@ -38,12 +46,19 @@ function createCard(word) {
     // Append faces to card
     card.appendChild(cardFront);
     card.appendChild(cardBack);
+    card.word = word;
 
     // Insert card container into the DOM
-    document.getElementById("cc").appendChild(card);
+    document.getElementById("cardContainer").appendChild(card);
 }
 
 
 function flipCard(card) {
     card.classList.toggle("flip");
+    console.log(card.word);
 }
+
+document.addEventListener('DOMContentLoaded', function () {
+
+
+});
