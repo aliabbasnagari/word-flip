@@ -17,13 +17,12 @@ console.log(word_pairs);
 console.log(word_pairs.includes(["Heart", "Beat"]));
 
 
-function PairExist(pair, pair_list) {
-    pair_list.forEach(words => {
-        if ((words[0] === pair[0] && words[1] === pair[1]) || (words[0] === pair[1] && words[1] === pair[0])) return true;
-    });
-    return false;
+function pairExists(pair, pair_list) {
+    return pair_list.some(words =>
+        (words[0] === pair[0] && words[1] === pair[1]) ||
+        (words[0] === pair[1] && words[1] === pair[0])
+    );
 }
-
 
 
 function shuffle(array) {
