@@ -60,11 +60,13 @@ function flipCard(card) {
         console.log("FOUNDED");
         PAIRS_FOUND++;
         if (PAIRS_FOUND == WORD_PAIRS.length) {
+            let concatenated_words = WORD_PAIRS.map(word => word).join(" <br> ");
             let title = popup.querySelector('h2');
             let message = popup.querySelector('p');
             title.innerHTML = "&#127881 Nice Going!";
-            message.innerHTML = `Congrats! You solved the puzzle.`;
+            message.innerHTML = `Congrats! You solved the puzzle. <br><br> <b>${concatenated_words}</b> `;
             popup.style.display = 'block';
+            console.log('WON');
         }
 
         ACTIVE_CARDS[0].cardBack.style.opacity = 0.3;

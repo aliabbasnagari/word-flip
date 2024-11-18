@@ -60,7 +60,8 @@
 }
 
 .wflip-header {
-    display: flex;
+    display: grid;
+    grid-template-columns: auto auto auto auto auto auto;
     gap: 20px;
     margin-bottom: 10px;
 }
@@ -86,4 +87,44 @@
 .wflip-header button:active {
     background-color: #004085;
     transform: translateY(0);
+}
+
+@media (max-width: 600px) {
+    .card-container {
+        width: 95%;
+        gap: 10px;
+    }
+
+    .card-face {
+        font-size: 14px;
+    }
+
+    .wflip-header {
+        gap: 10px;
+    }
+
+    .wflip-header button {
+        padding: 5px 10px;
+        font-size: 12px;
+    }
+}
+
+@media (max-width: 250px) {
+    .card-container {
+        width: 98%;
+        gap: 5px;
+    }
+
+    .card-face {
+        font-size: 10px;
+    }
+
+    .wflip-header {
+        gap: 3px;
+    }
+
+    .wflip-header button {
+        padding: 2px 4px;
+        font-size: 12px;
+    }
 }
