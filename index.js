@@ -102,8 +102,11 @@ document.addEventListener('DOMContentLoaded', () => {
     card_container.style.gridTemplateColumns = 'repeat(4, 1fr)';
 
     function loadGame(game_size) {
-        PAIRS_FOUND = 0;
         GAME_SIZE = game_size;
+        ACTIVE_CARDS = [];
+        WORD_PAIRS = [];
+        PAIRS_FOUND = 0;
+
         card_container.replaceChildren();
         card_container.style.gridTemplateColumns = `repeat(${GAME_SIZE[1]}, 1fr)`;
 
