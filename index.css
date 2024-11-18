@@ -58,3 +58,32 @@
 .card.flip {
     transform: rotateY(180deg);
 }
+
+.wflip-header {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 10px;
+}
+
+.wflip-header button {
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 20px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.wflip-header button:hover {
+    background-color: #0056b3;
+    transform: translateY(-2px);
+}
+
+.wflip-header button:active {
+    background-color: #004085;
+    transform: translateY(0);
+}

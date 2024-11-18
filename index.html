@@ -6,11 +6,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Flip Card</title>
     <link rel="stylesheet" href="index.css">
+    <link rel="stylesheet" href="popup.css">
 </head>
 
 <body>
 
-    <header>
+    <div id="popup" class="popup">
+        <div class="popup-content">
+            <span class="close-btn">&times;</span>
+            <h2>Message Here</h2>
+            <p>This is a custom message!</p>
+        </div>
+    </div>
+
+    <header class="wflip-header">
         <button id="btn44">4 x 4</button>
         <button id="btn45">4 x 5</button>
         <button id="btn54">5 x 4</button>
@@ -18,6 +27,8 @@
         <button id="btn65">6 x 5</button>
         <button id="btn66">6 x 6</button>
     </header>
+
+
 
     <div class="card-container" id="cardContainer">
         <div class="card" data-face="0" onclick="flipCard(this)">
@@ -28,7 +39,7 @@
         </div>
     </div>
 
-    <script type="module" src="index.js"></script>
+    <script src="index.js"></script>
 
 </body>
 

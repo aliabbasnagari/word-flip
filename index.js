@@ -1,6 +1,7 @@
 var GAME_SIZE = [4, 4];
 var ACTIVE_CARDS = [];
 var WORD_PAIRS = [];
+var PAIRS_FOUND = 0;
 
 
 function pairExists(pair, pairs_list) {
@@ -57,13 +58,14 @@ function flipCard(card) {
 
     if (ACTIVE_CARDS.length == 2 && pairExists([ACTIVE_CARDS[0].word, ACTIVE_CARDS[1].word], WORD_PAIRS)) {
         console.log("FOUNDED");
-        var clr = getRandomColor();
-
-        // ACTIVE_CARDS[0].cardBack.style.border = "6px solid " + clr;
-        // ACTIVE_CARDS[1].cardBack.style.border = "6px solid " + clr;
-
-        // ACTIVE_CARDS[0].cardBack.style.backgroundColor = "transparent";
-        // ACTIVE_CARDS[1].cardBack.style.backgroundColor = "transparent";
+        PAIRS_FOUND++;
+        if (PAIRS_FOUND == WORD_PAIRS.length) {
+            let title = popup.querySelector('h2');
+            let message = popup.querySelector('p');
+            title.innerHTML = "&#127881 Nice Going!";
+            message.innerHTML = `Congrats! You solved the puzzle.`;
+            popup.style.display = 'block';
+        }
 
         ACTIVE_CARDS[0].cardBack.style.opacity = 0.3;
         ACTIVE_CARDS[1].cardBack.style.opacity = 0.3;
@@ -71,39 +73,9 @@ function flipCard(card) {
         ACTIVE_CARDS[0].dataset.face = 2;
         ACTIVE_CARDS[1].dataset.face = 2;
         ACTIVE_CARDS = [];
-        // border 
-        // backgroundColor 
     }
 
     console.log(ACTIVE_CARDS);
-}
-
-function getRandomColor() {
-    // Define the color list only once if not already defined
-    if (!getRandomColor.colorList || getRandomColor.colorList.length === 0) {
-        getRandomColor.colorList = [
-            "#FF6347", // Tomato Red
-            "#4682B4", // Steel Blue
-            "#FFD700", // Gold
-            "#8A2BE2", // Blue Violet
-            "#32CD32", // Lime Green
-            "#FF4500", // Orange Red
-            "#2F4F4F", // Dark Slate Gray
-            "#800080", // Purple
-            "#FFFF00", // Yellow
-            "#00BFFF", // Deep Sky Blue
-            "#DC143C", // Crimson
-            "#00FF00", // Lime
-            "#D2691E", // Chocolate
-            "#0000FF", // Blue
-            "#FF1493", // Deep Pink
-            "#C71585", // Medium Violet Red
-            "#8B0000", // Dark Red
-            "#A52A2A" // Brown
-        ];
-    }
-    const randomIndex = Math.floor(Math.random() * getRandomColor.colorList.length);
-    return getRandomColor.colorList.splice(randomIndex, 1)[0];
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -121,10 +93,16 @@ document.addEventListener('DOMContentLoaded', () => {
     btn_65.addEventListener('click', () => loadGame([6, 5]));
     btn_66.addEventListener('click', () => loadGame([6, 6]));
 
+    const popup = document.getElementById('popup');
+    const closeBtn = document.querySelector('.close-btn');
+    closeBtn.onclick = () => popup.style.display = 'none';
+    window.onclick = (event) => event.target === popup && (popup.style.display = 'none');
+
     var card_container = document.getElementById("cardContainer");
     card_container.style.gridTemplateColumns = 'repeat(4, 1fr)';
 
     function loadGame(game_size) {
+        PAIRS_FOUND = 0;
         GAME_SIZE = game_size;
         card_container.replaceChildren();
         card_container.style.gridTemplateColumns = `repeat(${GAME_SIZE[1]}, 1fr)`;
