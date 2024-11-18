@@ -10,11 +10,25 @@
 
 <body>
 
-    <div class="card-container" id="cardContainer">
+    <header>
+        <button id="btn44">4 x 4</button>
+        <button id="btn45">4 x 5</button>
+        <button id="btn54">5 x 4</button>
+        <button id="btn56">5 x 6</button>
+        <button id="btn65">6 x 5</button>
+        <button id="btn66">6 x 6</button>
+    </header>
 
+    <div class="card-container" id="cardContainer">
+        <div class="card" data-face="0" onclick="flipCard(this)">
+            <div class="card-face card-front">
+
+            </div>
+            <div class="card-face card-back">Can</div>
+        </div>
     </div>
 
-    <script src="index.js"></script>
+    <script type="module" src="index.js"></script>
 
 </body>
 
