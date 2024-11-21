@@ -2,12 +2,22 @@ var GAME_SIZE = [4, 4];
 var ACTIVE_CARDS = [];
 var WORD_PAIRS = [];
 var PAIRS_FOUND = 0;
+var SCORE = 0;
+var CLICKS = 0;
+var TIME_ELAPSED = 0;
 
 var dance_duration = 1000;
 
+// Global Elements
+var messageSpan = null;
+var flywordSpan = null;
 
 function pairExists(pair, pairs_list) {
-    return pairs_list.includes(`${pair[0]} ${pair[1]}`) || pairs_list.includes(`${pair[1]} ${pair[0]}`);
+    if (pairs_list.includes(`${pair[0]} ${pair[1]}`))
+        return `${pair[0]} ${pair[1]}`
+    else if (pairs_list.includes(`${pair[1]} ${pair[0]}`))
+        return `${pair[1]} ${pair[0]}`
+    return null;
 }
 
 
@@ -52,19 +62,31 @@ function flipCard(card) {
         card.classList.toggle("flip");
         card.dataset.face = 1;  // Mark the card as face-up
         ACTIVE_CARDS.push(card);
+        CLICKS++;
     } else if (card.dataset.face == 1) {
         card.classList.toggle("flip");
         card.dataset.face = 0;  // Mark the card as face-down
         ACTIVE_CARDS = ACTIVE_CARDS.filter(C => C !== card);
     }
 
-
-    console.log(ACTIVE_CARDS);
+    // console.log(ACTIVE_CARDS);
 
     if (ACTIVE_CARDS.length == 2) {
-
-        if (pairExists([ACTIVE_CARDS[0].word, ACTIVE_CARDS[1].word], WORD_PAIRS)) {
+        let pair = pairExists([ACTIVE_CARDS[0].word, ACTIVE_CARDS[1].word], WORD_PAIRS);
+        if (pair != null) {
             console.log("FOUNDED");
+            TIME_ELAPSED = (new Date() - TIME_ELAPSED) / 1000;
+            let points = parseInt((20) * (2 / CLICKS) * (15 / TIME_ELAPSED));
+            animateCounter(messageSpan, SCORE, SCORE + points, 1000);
+            SCORE += points;
+            console.log(`Score: ${SCORE.toFixed(2)} C: ${CLICKS} T: ${TIME_ELAPSED} P: ${points.toFixed(2)}`);
+            CLICKS = 0;
+            TIME_ELAPSED = new Date();
+
+            flywordSpan.textContent = `${pair}`;
+            flywordSpan.classList.add('fly');
+            setTimeout(() => flywordSpan.classList.remove('fly'), 2000);
+
 
             PAIRS_FOUND++;
             if (PAIRS_FOUND == WORD_PAIRS.length) {
@@ -89,7 +111,6 @@ function flipCard(card) {
             setTimeout(() => ACTIVE_CARDS = [], dance_duration);
 
         } else {
-            console.log("NOT FOUNDED");
             setTimeout(() => {
                 if (ACTIVE_CARDS[0]) {
                     ACTIVE_CARDS[0].classList.toggle("flip");
@@ -100,9 +121,31 @@ function flipCard(card) {
                     ACTIVE_CARDS[1].dataset.face = 0;
                 }
                 ACTIVE_CARDS = [];
-            }, 2000);
+            }, 3000);
         }
     }
+}
+
+function animateCounter(counter, start, end, duration) {
+    const range = end - start;
+    let current = start;
+    const increment = range / (duration / 10);
+
+    function updateCounter() {
+        current += increment;
+        if ((increment > 0 && current >= end) || (increment < 0 && current <= end)) {
+            current = end;
+            clearInterval(timer);
+        }
+        counter.innerHTML = `score <h2>${Math.round(current)}</h2>`;
+        // Add animation effect
+        counter.style.transform = "scale(1.2)";
+        setTimeout(() => {
+            counter.style.transform = "scale(1)";
+        }, 100);
+    }
+
+    const timer = setInterval(updateCounter, 10);
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -128,18 +171,19 @@ document.addEventListener('DOMContentLoaded', () => {
     var card_container = document.getElementById("cardContainer");
     card_container.style.gridTemplateColumns = 'repeat(4, 1fr)';
 
-    var message = document.getElementById("wflipMessages");
+    messageSpan = document.getElementById("wfMessage");
+    flywordSpan = document.getElementById("wfFlyword");
 
     function loadGame(game_size) {
         GAME_SIZE = game_size;
-        ACTIVE_CARDS = [];
-        WORD_PAIRS = [];
-        PAIRS_FOUND = 0;
+        ACTIVE_CARDS = WORD_PAIRS = [];
+        PAIRS_FOUND = CLICKS = SCORE = 0;
+        TIME_ELAPSED = new Date();
 
         card_container.replaceChildren();
         card_container.style.gridTemplateColumns = `repeat(${GAME_SIZE[1]}, 1fr)`;
 
-        message.innerHTML = '<h3> Loading... </h3>';
+        messageSpan.innerHTML = '<h3> Loading... </h3>';
         fetch(`https://mytoronto.thedev.ca/wp-json/words/v1/random-words/?count=${(GAME_SIZE[0] * GAME_SIZE[1]) / 2}`)
             .then(response => {
                 if (!response.ok) {
@@ -158,14 +202,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     words.forEach(word => {
                         createCard(word, card_container);
                     });
-                    message.innerHTML = '';
+                    messageSpan.innerHTML = `score <h2>0</h2>`;
+
                 } catch (error) {
                     throw new Error(`Error creating cards: ${error.message}`);
                 }
             }).catch(error => {
                 console.error(error);
-                message.innerHTML = `<h3>Error: ${error.message}</h3>`;
+                messageSpan.innerHTML = `<h3>Error: ${error.message}</h3>`;
             });
     }
-
 });

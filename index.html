@@ -19,7 +19,7 @@
         </div>
     </div>
 
-    <header class="wflip-header">
+    <header class="wf-header">
         <button id="btn44">4 x 4</button>
         <button id="btn45">4 x 5</button>
         <button id="btn54">5 x 4</button>
@@ -28,12 +28,16 @@
         <button id="btn66">6 x 6</button>
     </header>
 
-    <div id="wflipMessages" class="wflip-messages">
-        <h2>
+    <div class="wf-message-container">
+        <span id="wfMessage" class="wf-message">
             Let's match the words!
             <br>
             select grid size to start the game.
-        </h2>
+        </span>
+    </div>
+
+    <div class="wf-flyword-container">
+        <span id="wfFlyword" class="wf-flyword">Well Done!</span>
     </div>
 
     <div class="card-container" id="cardContainer">
@@ -46,7 +50,6 @@
     </div>
 
     <script src="index.js"></script>
-
 </body>
 
 </html>
