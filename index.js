@@ -23,7 +23,7 @@ var GAME = {
     },
     values: {
         API_URL: "https://mytoronto.thedev.ca/wp-json/words/v1/random-words/?count=8",
-        DANCE_DURATION: 2000,
+        ANIM_DURATION: 2000,
     },
     timer: {
         stopwatchInterval: null,
@@ -100,7 +100,8 @@ var GAME = {
             console.log(this.state.WORD_PAIRS);
 
             this.elements.messageSpan.innerHTML = `score <h2>0</h2>`;
-            const words = shuffle(this.state.WORD_PAIRS.flatMap(item => item.split(" ")));
+            // const words = shuffle(this.state.WORD_PAIRS.flatMap(item => item.split(" ")));
+            const words = this.state.WORD_PAIRS.flatMap(item => item.split(" "));
             console.log(words);
             words.forEach(word => {
                 fragment.appendChild(createCard(word));
@@ -117,6 +118,24 @@ var GAME = {
             this.state.IS_LOADING = false
         });
     },
+    calculatePoints(currClicks, currTime) {
+        // Constants for scoring
+        const BASE_POINTS = 20;        // Base score multiplier
+        const MIN_TIME = 1;            // Minimum time to avoid division by zero
+        const MIN_CLICKS = 2;          // Minimum clicks to avoid division by zero
+
+        // Ensure valid inputs
+        currClicks = Math.max(currClicks, MIN_CLICKS); // Avoid division by zero or invalid clicks
+        currTime = Math.max(currTime, MIN_TIME);       // Avoid division by zero or invalid time
+
+        // Calculate points
+        const efficiencyFactor = Math.round(2 / currClicks); // Higher score for fewer clicks
+        const speedFactor = Math.ceil(15 / currTime);        // Higher score for faster matches
+        const points = BASE_POINTS * efficiencyFactor * speedFactor;
+
+        // Ensure points are non-negative
+        return Math.max(0, points);
+    },
     checkStatus() {
         if (this.state.IS_PLAYING) {
             this.elements.clicksDisplay.textContent = `Clicks: ${this.state.CLICKS}`;
@@ -127,27 +146,35 @@ var GAME = {
                     this.state.PAIRS_FOUND++;
                     const currTime = this.timer.elapsedTime - this.state.TIME_CHECKPOINT;
                     const currClicks = this.state.CLICKS - this.state.CLICK_CHECKPOINT;
-                    console.log(`Time: ${currTime} Clicks: ${currClicks}`);
                     this.state.TIME_CHECKPOINT = this.timer.elapsedTime;
                     this.state.CLICK_CHECKPOINT = this.state.CLICKS;
-                    const points = parseInt((20) * Math.round((2 / currClicks)) * Math.ceil((15 / currTime)));
+                    //const points = parseInt((20) * Math.round((2 / currClicks)) * Math.ceil((15 / currTime)));
+                    const points = this.calculatePoints(currClicks, currTime);
                     this.state.SCORE += points;
 
                     const fly = document.createElement('span');
                     fly.classList.add('wf-flyword');
                     fly.innerHTML = pair;
                     this.elements.flywordSpan.appendChild(fly);
-                    setTimeout(() => {
-                        this.elements.flywordSpan.removeChild(fly);
-                        this.state.IS_PLAYING && this.checkWin();
-                    }, this.values.DANCE_DURATION);
-
                     animateCounter(this.elements.messageSpan, this.state.SCORE - points, this.state.SCORE, 1000);
 
-                    console.log(`Points: ${points} Score: ${this.state.SCORE} ${this.state.CLICKS} ${this.state.TIME_CHECKPOINT} ${this.state.CLICK_CHECKPOINT}`);
+                    console.log({
+                        Points: points,
+                        Score: this.state.SCORE,
+                        Clicks: this.state.CLICKS,
+                        TimeCheckpoint: this.state.TIME_CHECKPOINT,
+                        ClickCheckpoint: this.state.CLICK_CHECKPOINT,
+                        currTime: currTime,
+                        currClicks: currClicks
+                    });
+
 
                     this.state.ACTIVE_CARDS[0].cardBack.style.opacity = 0.3;
                     this.state.ACTIVE_CARDS[1].cardBack.style.opacity = 0.3;
+
+                    const clr = getRandomColor();
+                    this.state.ACTIVE_CARDS[0].cardBack.style.backgroundColor = clr;
+                    this.state.ACTIVE_CARDS[1].cardBack.style.backgroundColor = clr;
 
                     this.state.ACTIVE_CARDS[0].dataset.face = 2;
                     this.state.ACTIVE_CARDS[1].dataset.face = 2;
@@ -155,7 +182,11 @@ var GAME = {
                     this.state.ACTIVE_CARDS[0].classList.add("dance");
                     this.state.ACTIVE_CARDS[1].classList.add("dance");
 
-                    setTimeout(() => this.state.ACTIVE_CARDS = [], this.values.DANCE_DURATION);
+                    setTimeout(() => {
+                        this.elements.flywordSpan.removeChild(fly);
+                        this.state.ACTIVE_CARDS = [];
+                        this.checkWin();
+                    }, this.values.ANIM_DURATION);
                 } else {
                     setTimeout(() => {
                         if (this.state.ACTIVE_CARDS[0]) {
@@ -167,13 +198,13 @@ var GAME = {
                             this.state.ACTIVE_CARDS[1].dataset.face = 0;
                         }
                         this.state.ACTIVE_CARDS = [];
-                    }, 3000);
+                    }, this.values.ANIM_DURATION);
                 }
             }
         }
     },
     checkWin() {
-        if (this.state.PAIRS_FOUND == this.state.WORD_PAIRS.length) {
+        if (this.state.IS_PLAYING && this.state.PAIRS_FOUND == this.state.WORD_PAIRS.length) {
             const concatenated_words = this.state.WORD_PAIRS.map(word => word).join(" <br> ");
             const title = this.elements.popup.main.querySelector('h2');
             const message = this.elements.popup.main.querySelector('p');
@@ -269,6 +300,30 @@ function animateCounter(counter, start, end, duration) {
     }
 
     const timer = setInterval(updateCounter, 10);
+}
+
+function getRandomColor() {
+    // Define the color list only once if not already defined
+    if (!getRandomColor.colorList || getRandomColor.colorList.length === 0) {
+        getRandomColor.colorList = [
+            "#FF6347", // Tomato Red
+            "#4682B4", // Steel Blue
+            "#FFD700", // Gold
+            "#AA2BE2", // Blue Violet
+            "#2F4A4F", // Dark Slate Gray
+            "#500FFF", // Purple
+            "#00BFFF", // Deep Sky Blue
+            "#DC143C", // Crimson
+            "#99FF00", // Lime
+            "#D2691E", // Chocolate
+            "#FF1493", // Deep Pink
+            "#8B0000", // Dark Red
+            "#52280b", // Brown
+            '#89A8B2',
+        ];
+    }
+    const randomIndex = Math.floor(Math.random() * getRandomColor.colorList.length);
+    return getRandomColor.colorList.splice(randomIndex, 1)[0];
 }
 
 let debounceTimeout;
