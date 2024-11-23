@@ -6,14 +6,16 @@ var GAME = {
         PAIRS_FOUND: 0,
         SCORE: 0,
         CLICKS: 0,
-        TIME_ELAPSED: 0,
+        CLICK_CHECKPOINT: 0,
         TIME_CHECKPOINT: 0,
-        isLoading: false,
+        IS_LOADING: false,
+        IS_PLAYING: false,
     },
     elements: {
         cardContainer: null,
         messageSpan: null,
         flywordSpan: null,
+        clicksDisplay: null,
         popup: {
             main: null,
             closeBtn: null,
@@ -21,7 +23,7 @@ var GAME = {
     },
     values: {
         API_URL: "https://mytoronto.thedev.ca/wp-json/words/v1/random-words/?count=8",
-        DANCE_DURATION: 1000,
+        DANCE_DURATION: 2000,
     },
     timer: {
         stopwatchInterval: null,
@@ -58,7 +60,8 @@ var GAME = {
     init() {
         this.elements.cardContainer = document.getElementById("cardContainer");
         this.elements.messageSpan = document.getElementById("wfMessage");
-        this.elements.flywordSpan = document.getElementById("wfFlyword");
+        this.elements.flywordSpan = document.getElementById("wfFlywordContainer");
+        this.elements.clicksDisplay = document.getElementById('wfClicks');
         this.elements.popup.main = document.getElementById('wfPopup');
         this.elements.popup.closeBtn = this.elements.popup.main.querySelector('.wf-close-btn');
         this.timer.stopwatchDisplay = document.getElementById('wfTimer');
@@ -75,15 +78,17 @@ var GAME = {
             PAIRS_FOUND: 0,
             SCORE: 0,
             CLICKS: 0,
-            TIME_ELAPSED: 0,
+            CLICK_CHECKPOINT: 0,
             TIME_CHECKPOINT: 0,
-            isLoading: false,
+            IS_LOADING: false,
+            IS_PLAYING: false,
         }
         this.elements.cardContainer.replaceChildren();
         this.elements.cardContainer.style.gridTemplateColumns = `repeat(${game_size[1]}, 1fr)`;
+        this.timer.resetStopwatch();
     },
     loadWords() {
-        this.state.isLoading = true;
+        this.state.IS_LOADING = true;
         this.elements.messageSpan.innerHTML = '<h3> Loading... </h3>';
         fetch(this.values.API_URL).then(response => {
             if (!response.ok) throw new Error(`Error fetching words: ${response.statusText}`);
@@ -95,79 +100,90 @@ var GAME = {
             console.log(this.state.WORD_PAIRS);
 
             this.elements.messageSpan.innerHTML = `score <h2>0</h2>`;
-            const words = this.state.WORD_PAIRS.flatMap(item => item.split(" "));
+            const words = shuffle(this.state.WORD_PAIRS.flatMap(item => item.split(" ")));
             console.log(words);
             words.forEach(word => {
                 fragment.appendChild(createCard(word));
             });
             this.elements.cardContainer.appendChild(fragment);
             this.elements.messageSpan.innerHTML = `score <h2>0</h2>`;
-            GAME.timer.resetStopwatch();
+            this.elements.clicksDisplay.textContent = `Clicks: ${this.state.CLICKS}`;
             GAME.timer.startStopwatch();
+            this.state.IS_PLAYING = true;
         }).catch(error => {
             console.error(error);
             this.elements.messageSpan.innerHTML = `<h3>Error: ${error.message}</h3>`;
         }).finally(() => {
-            this.state.isLoading = false
+            this.state.IS_LOADING = false
         });
     },
     checkStatus() {
-        if (this.state.ACTIVE_CARDS.length == 2) {
-            let pair = pairExists([this.state.ACTIVE_CARDS[0].dataset.word, this.state.ACTIVE_CARDS[1].dataset.word], this.state.WORD_PAIRS);
-            if (pair != null) {
-                console.log("FOUNDED");
+        if (this.state.IS_PLAYING) {
+            this.elements.clicksDisplay.textContent = `Clicks: ${this.state.CLICKS}`;
+            if (this.state.ACTIVE_CARDS.length == 2) {
+                const pair = pairExists([this.state.ACTIVE_CARDS[0].dataset.word, this.state.ACTIVE_CARDS[1].dataset.word], this.state.WORD_PAIRS);
+                if (pair != null) {
+                    console.log("FOUNDED");
+                    this.state.PAIRS_FOUND++;
+                    const currTime = this.timer.elapsedTime - this.state.TIME_CHECKPOINT;
+                    const currClicks = this.state.CLICKS - this.state.CLICK_CHECKPOINT;
+                    console.log(`Time: ${currTime} Clicks: ${currClicks}`);
+                    this.state.TIME_CHECKPOINT = this.timer.elapsedTime;
+                    this.state.CLICK_CHECKPOINT = this.state.CLICKS;
+                    const points = parseInt((20) * Math.round((2 / currClicks)) * Math.ceil((15 / currTime)));
+                    this.state.SCORE += points;
 
-                this.state.TIME_ELAPSED = this.timer.elapsedTime - this.state.TIME_CHECKPOINT;
-                this.state.TIME_CHECKPOINT = this.timer.elapsedTime;
-                let points = parseInt((20) * (2 / this.state.CLICKS) * (15 / this.state.TIME_ELAPSED));
-                animateCounter(this.elements.messageSpan, this.state.SCORE, this.state.SCORE + points, 1000);
-                this.state.SCORE += points;
+                    const fly = document.createElement('span');
+                    fly.classList.add('wf-flyword');
+                    fly.innerHTML = pair;
+                    this.elements.flywordSpan.appendChild(fly);
+                    setTimeout(() => {
+                        this.elements.flywordSpan.removeChild(fly);
+                        this.state.IS_PLAYING && this.checkWin();
+                    }, this.values.DANCE_DURATION);
 
-                console.log(`Score: ${this.state.SCORE.toFixed(2)} C: ${this.state.CLICKS} T: ${this.state.TIME_ELAPSED} P: ${points.toFixed(2)}`);
+                    animateCounter(this.elements.messageSpan, this.state.SCORE - points, this.state.SCORE, 1000);
 
-                this.state.CLICKS = 0;
-                this.elements.flywordSpan.textContent = `${pair}`;
-                this.elements.flywordSpan.classList.add('fly');
-                setTimeout(() => this.elements.flywordSpan.classList.remove('fly'), 2000);
+                    console.log(`Points: ${points} Score: ${this.state.SCORE} ${this.state.CLICKS} ${this.state.TIME_CHECKPOINT} ${this.state.CLICK_CHECKPOINT}`);
 
+                    this.state.ACTIVE_CARDS[0].cardBack.style.opacity = 0.3;
+                    this.state.ACTIVE_CARDS[1].cardBack.style.opacity = 0.3;
 
-                this.state.PAIRS_FOUND++;
-                if (this.state.PAIRS_FOUND == this.state.WORD_PAIRS.length) {
-                    let concatenated_words = this.state.WORD_PAIRS.map(word => word).join(" <br> ");
-                    let title = this.elements.popup.main.querySelector('h2');
-                    let message = this.elements.popup.main.querySelector('p');
-                    title.innerHTML = "&#127881 Nice Going!";
-                    message.innerHTML = `Congrats! You solved the puzzle. <br><br> <b>${concatenated_words}</b> `;
-                    this.elements.popup.main.style.display = 'block';
-                    this.timer.stopStopwatch();
+                    this.state.ACTIVE_CARDS[0].dataset.face = 2;
+                    this.state.ACTIVE_CARDS[1].dataset.face = 2;
 
-                    console.log('WON');
+                    this.state.ACTIVE_CARDS[0].classList.add("dance");
+                    this.state.ACTIVE_CARDS[1].classList.add("dance");
+
+                    setTimeout(() => this.state.ACTIVE_CARDS = [], this.values.DANCE_DURATION);
+                } else {
+                    setTimeout(() => {
+                        if (this.state.ACTIVE_CARDS[0]) {
+                            this.state.ACTIVE_CARDS[0].classList.toggle("flip");
+                            this.state.ACTIVE_CARDS[0].dataset.face = 0;
+                        }
+                        if (this.state.ACTIVE_CARDS[1]) {
+                            this.state.ACTIVE_CARDS[1].classList.toggle("flip");
+                            this.state.ACTIVE_CARDS[1].dataset.face = 0;
+                        }
+                        this.state.ACTIVE_CARDS = [];
+                    }, 3000);
                 }
-
-                this.state.ACTIVE_CARDS[0].cardBack.style.opacity = 0.3;
-                this.state.ACTIVE_CARDS[1].cardBack.style.opacity = 0.3;
-
-                this.state.ACTIVE_CARDS[0].dataset.face = 2;
-                this.state.ACTIVE_CARDS[1].dataset.face = 2;
-
-                this.state.ACTIVE_CARDS[0].classList.add("dance");
-                this.state.ACTIVE_CARDS[1].classList.add("dance");
-
-                setTimeout(() => this.state.ACTIVE_CARDS = [], this.values.DANCE_DURATION);
-                //this.state.ACTIVE_CARDS = [];
-            } else {
-                setTimeout(() => {
-                    if (this.state.ACTIVE_CARDS[0]) {
-                        this.state.ACTIVE_CARDS[0].classList.toggle("flip");
-                        this.state.ACTIVE_CARDS[0].dataset.face = 0;
-                    }
-                    if (this.state.ACTIVE_CARDS[1]) {
-                        this.state.ACTIVE_CARDS[1].classList.toggle("flip");
-                        this.state.ACTIVE_CARDS[1].dataset.face = 0;
-                    }
-                    this.state.ACTIVE_CARDS = [];
-                }, 3000);
             }
+        }
+    },
+    checkWin() {
+        if (this.state.PAIRS_FOUND == this.state.WORD_PAIRS.length) {
+            const concatenated_words = this.state.WORD_PAIRS.map(word => word).join(" <br> ");
+            const title = this.elements.popup.main.querySelector('h2');
+            const message = this.elements.popup.main.querySelector('p');
+            title.innerHTML = "&#127881 Nice Going!";
+            message.innerHTML = `Congrats! You found all matches. <br><br> <b>${concatenated_words}</b> `;
+            this.elements.popup.main.style.display = 'block';
+            this.timer.stopStopwatch();
+
+            console.log('WON');
+            this.state.IS_PLAYING = false;
         }
     }
 };
@@ -220,12 +236,11 @@ function createCard(word) {
 
 
 function flipCard(card) {
-    if (card.dataset.face == 0 && GAME.state.ACTIVE_CARDS.length < 2) {
+    if (GAME.state.IS_PLAYING && card.dataset.face == 0 && GAME.state.ACTIVE_CARDS.length < 2) {
         card.classList.toggle("flip");
         card.dataset.face = 1;  // Mark the card as face-up
         GAME.state.ACTIVE_CARDS.push(card);
         GAME.state.CLICKS++;
-
         GAME.checkStatus();
     } else if (card.dataset.face == 1) {
         //card.classList.toggle("flip");
@@ -264,12 +279,13 @@ function debounce(func, wait) {
 
 document.addEventListener('DOMContentLoaded', () => {
     var btnStart = document.getElementById("btnStart");
-    btnStart.addEventListener('click', () => !GAME.state.isLoading && loadGame([4, 4]));
+    btnStart.addEventListener('click', () => !GAME.state.IS_LOADING && loadGame([4, 4]));
 
     GAME.init();
 
     function loadGame(game_size) {
         GAME.reset(game_size);
         GAME.loadWords();
+        GAME.elements.cardContainer.scrollIntoView({ behavior: 'smooth' });
     }
 });

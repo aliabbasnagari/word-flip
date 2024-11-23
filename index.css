@@ -117,26 +117,27 @@
 }
 
 .wf-flyword-container {
+    display: flex;
+    flex-direction: column;
     position: fixed;
     top: 50%;
     left: 50%;
-    display: flex;
     justify-content: center;
     align-items: center;
     transform: translate(-50%, -50%);
     z-index: 100;
+    user-select: none;
 }
 
 .wf-flyword {
-    font-size: 24px;
+    font-size: 3rem;
+    color: #333;
     text-align: center;
-    display: none;
-}
-
-
-.wf-flyword.fly {
-    display: block;
     animation: flyUp 2s ease-out;
+    text-shadow: -1px -1px 0 whitesmoke;
+    background-color: rgba(232, 238, 238, 0.738);
+    padding: 10px;
+    border-radius: 20px;
 }
 
 
@@ -152,11 +153,15 @@
 
     .wf-header {
         gap: 10px;
+        font-size: 14px;
     }
 
     .wf-header button {
         padding: 5px 10px;
-        font-size: 12px;
+    }
+
+    .wf-flyword {
+        font-size: 1.5rem;
     }
 }
 
@@ -172,11 +177,11 @@
 
     .wf-header {
         gap: 3px;
+        font-size: 10px;
     }
 
     .wf-header button {
         padding: 2px 4px;
-        font-size: 12px;
     }
 }
 
