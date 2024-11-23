@@ -6,8 +6,9 @@ var GAME = {
         PAIRS_FOUND: 0,
         SCORE: 0,
         CLICKS: 0,
-        TOTAL_TIME_ELAPSED: 0,
+        TIME_ELAPSED: 0,
         TIME_CHECKPOINT: 0,
+        isLoading: false,
     },
     elements: {
         cardContainer: null,
@@ -22,12 +23,45 @@ var GAME = {
         API_URL: "https://mytoronto.thedev.ca/wp-json/words/v1/random-words/?count=8",
         DANCE_DURATION: 1000,
     },
+    timer: {
+        stopwatchInterval: null,
+        stopwatchDisplay: null,
+        elapsedTime: 0,
+        startStopwatch() {
+            if (this.stopwatchInterval) return;
+            this.stopwatchInterval = setInterval(() => {
+                this.elapsedTime++;
+                this.updateStopwatchDisplay();
+            }, 1000);
+        },
+        stopStopwatch() {
+            clearInterval(this.stopwatchInterval);
+            this.stopwatchInterval = null;
+        },
+        resetStopwatch() {
+            this.stopStopwatch();
+            this.elapsedTime = 0;
+            this.updateStopwatchDisplay();
+        },
+        updateStopwatchDisplay() {
+            if (this.elapsedTime >= 0) {
+                const hours = Math.floor(this.elapsedTime / 3600);
+                const minutes = Math.floor((this.elapsedTime % 3600) / 60);
+                const seconds = this.elapsedTime % 60;
+                if (this.stopwatchDisplay)
+                    this.stopwatchDisplay.textContent = `${hours}:${minutes < 10 ? '0' : ''}${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+            } else if (this.stopwatchDisplay) {
+                this.stopwatchDisplay.textContent = '00:00:00';
+            }
+        }
+    },
     init() {
         this.elements.cardContainer = document.getElementById("cardContainer");
         this.elements.messageSpan = document.getElementById("wfMessage");
         this.elements.flywordSpan = document.getElementById("wfFlyword");
         this.elements.popup.main = document.getElementById('wfPopup');
         this.elements.popup.closeBtn = this.elements.popup.main.querySelector('.wf-close-btn');
+        this.timer.stopwatchDisplay = document.getElementById('wfTimer');
 
         this.elements.cardContainer.style.gridTemplateColumns = 'repeat(4, 1fr)';
         this.elements.popup.closeBtn.onclick = () => this.elements.popup.main.style.display = 'none';
@@ -41,31 +75,40 @@ var GAME = {
             PAIRS_FOUND: 0,
             SCORE: 0,
             CLICKS: 0,
-            TOTAL_TIME_ELAPSED: 0,
+            TIME_ELAPSED: 0,
             TIME_CHECKPOINT: 0,
+            isLoading: false,
         }
         this.elements.cardContainer.replaceChildren();
         this.elements.cardContainer.style.gridTemplateColumns = `repeat(${game_size[1]}, 1fr)`;
     },
     loadWords() {
+        this.state.isLoading = true;
         this.elements.messageSpan.innerHTML = '<h3> Loading... </h3>';
         fetch(this.values.API_URL).then(response => {
-            if (!response.ok) {
-                throw new Error(`Error fetching words: ${response.statusText}`);
-            }
+            if (!response.ok) throw new Error(`Error fetching words: ${response.statusText}`);
             return response.json();
         }).then(words_json => {
             const fragment = document.createDocumentFragment();
             this.state.WORD_PAIRS = words_json.words;
+
+            console.log(this.state.WORD_PAIRS);
+
             this.elements.messageSpan.innerHTML = `score <h2>0</h2>`;
-            this.state.WORD_PAIRS.flatMap(item => item.split(" ")).forEach(word => {
+            const words = this.state.WORD_PAIRS.flatMap(item => item.split(" "));
+            console.log(words);
+            words.forEach(word => {
                 fragment.appendChild(createCard(word));
             });
             this.elements.cardContainer.appendChild(fragment);
             this.elements.messageSpan.innerHTML = `score <h2>0</h2>`;
+            GAME.timer.resetStopwatch();
+            GAME.timer.startStopwatch();
         }).catch(error => {
             console.error(error);
             this.elements.messageSpan.innerHTML = `<h3>Error: ${error.message}</h3>`;
+        }).finally(() => {
+            this.state.isLoading = false
         });
     },
     checkStatus() {
@@ -73,52 +116,56 @@ var GAME = {
             let pair = pairExists([this.state.ACTIVE_CARDS[0].dataset.word, this.state.ACTIVE_CARDS[1].dataset.word], this.state.WORD_PAIRS);
             if (pair != null) {
                 console.log("FOUNDED");
-                TIME_ELAPSED = (new Date() - TIME_ELAPSED) / 1000;
-                let points = parseInt((20) * (2 / CLICKS) * (15 / TIME_ELAPSED));
-                animateCounter(messageSpan, SCORE, SCORE + points, 1000);
-                SCORE += points;
-                console.log(`Score: ${SCORE.toFixed(2)} C: ${CLICKS} T: ${TIME_ELAPSED} P: ${points.toFixed(2)}`);
-                CLICKS = 0;
-                TIME_ELAPSED = new Date();
 
-                flywordSpan.textContent = `${pair}`;
-                flywordSpan.classList.add('fly');
-                setTimeout(() => flywordSpan.classList.remove('fly'), 2000);
+                this.state.TIME_ELAPSED = this.timer.elapsedTime - this.state.TIME_CHECKPOINT;
+                this.state.TIME_CHECKPOINT = this.timer.elapsedTime;
+                let points = parseInt((20) * (2 / this.state.CLICKS) * (15 / this.state.TIME_ELAPSED));
+                animateCounter(this.elements.messageSpan, this.state.SCORE, this.state.SCORE + points, 1000);
+                this.state.SCORE += points;
+
+                console.log(`Score: ${this.state.SCORE.toFixed(2)} C: ${this.state.CLICKS} T: ${this.state.TIME_ELAPSED} P: ${points.toFixed(2)}`);
+
+                this.state.CLICKS = 0;
+                this.elements.flywordSpan.textContent = `${pair}`;
+                this.elements.flywordSpan.classList.add('fly');
+                setTimeout(() => this.elements.flywordSpan.classList.remove('fly'), 2000);
 
 
-                PAIRS_FOUND++;
-                if (PAIRS_FOUND == WORD_PAIRS.length) {
-                    let concatenated_words = WORD_PAIRS.map(word => word).join(" <br> ");
-                    let title = popup.querySelector('h2');
-                    let message = popup.querySelector('p');
+                this.state.PAIRS_FOUND++;
+                if (this.state.PAIRS_FOUND == this.state.WORD_PAIRS.length) {
+                    let concatenated_words = this.state.WORD_PAIRS.map(word => word).join(" <br> ");
+                    let title = this.elements.popup.main.querySelector('h2');
+                    let message = this.elements.popup.main.querySelector('p');
                     title.innerHTML = "&#127881 Nice Going!";
                     message.innerHTML = `Congrats! You solved the puzzle. <br><br> <b>${concatenated_words}</b> `;
-                    popup.style.display = 'block';
+                    this.elements.popup.main.style.display = 'block';
+                    this.timer.stopStopwatch();
 
                     console.log('WON');
                 }
 
-                ACTIVE_CARDS[0].cardBack.style.opacity = 0.3;
-                ACTIVE_CARDS[1].cardBack.style.opacity = 0.3;
+                this.state.ACTIVE_CARDS[0].cardBack.style.opacity = 0.3;
+                this.state.ACTIVE_CARDS[1].cardBack.style.opacity = 0.3;
 
-                ACTIVE_CARDS[0].dataset.face = 2;
-                ACTIVE_CARDS[1].dataset.face = 2;
+                this.state.ACTIVE_CARDS[0].dataset.face = 2;
+                this.state.ACTIVE_CARDS[1].dataset.face = 2;
 
-                ACTIVE_CARDS[0].classList.add("dance");
-                ACTIVE_CARDS[1].classList.add("dance");
-                setTimeout(() => ACTIVE_CARDS = [], dance_duration);
+                this.state.ACTIVE_CARDS[0].classList.add("dance");
+                this.state.ACTIVE_CARDS[1].classList.add("dance");
 
+                setTimeout(() => this.state.ACTIVE_CARDS = [], this.values.DANCE_DURATION);
+                //this.state.ACTIVE_CARDS = [];
             } else {
                 setTimeout(() => {
-                    if (ACTIVE_CARDS[0]) {
-                        ACTIVE_CARDS[0].classList.toggle("flip");
-                        ACTIVE_CARDS[0].dataset.face = 0;
+                    if (this.state.ACTIVE_CARDS[0]) {
+                        this.state.ACTIVE_CARDS[0].classList.toggle("flip");
+                        this.state.ACTIVE_CARDS[0].dataset.face = 0;
                     }
-                    if (ACTIVE_CARDS[1]) {
-                        ACTIVE_CARDS[1].classList.toggle("flip");
-                        ACTIVE_CARDS[1].dataset.face = 0;
+                    if (this.state.ACTIVE_CARDS[1]) {
+                        this.state.ACTIVE_CARDS[1].classList.toggle("flip");
+                        this.state.ACTIVE_CARDS[1].dataset.face = 0;
                     }
-                    ACTIVE_CARDS = [];
+                    this.state.ACTIVE_CARDS = [];
                 }, 3000);
             }
         }
@@ -178,12 +225,13 @@ function flipCard(card) {
         card.dataset.face = 1;  // Mark the card as face-up
         GAME.state.ACTIVE_CARDS.push(card);
         GAME.state.CLICKS++;
+
+        GAME.checkStatus();
     } else if (card.dataset.face == 1) {
-        card.classList.toggle("flip");
-        card.dataset.face = 0;  // Mark the card as face-down
-        GAME.state.ACTIVE_CARDS = GAME.state.ACTIVE_CARDS.filter(C => C !== card);
+        //card.classList.toggle("flip");
+        //card.dataset.face = 0;  // Mark the card as face-down
+        //GAME.state.ACTIVE_CARDS = GAME.state.ACTIVE_CARDS.filter(C => C !== card);
     }
-    GAME.checkStatus();
 }
 
 function animateCounter(counter, start, end, duration) {
@@ -208,20 +256,15 @@ function animateCounter(counter, start, end, duration) {
     const timer = setInterval(updateCounter, 10);
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    var btn_44 = document.getElementById("btn44");
-    var btn_45 = document.getElementById("btn45");
-    var btn_54 = document.getElementById("btn54");
-    var btn_56 = document.getElementById("btn56");
-    var btn_65 = document.getElementById("btn65");
-    var btn_66 = document.getElementById("btn66");
+let debounceTimeout;
+function debounce(func, wait) {
+    clearTimeout(debounceTimeout);
+    debounceTimeout = setTimeout(func, wait);
+}
 
-    btn_44.addEventListener('click', () => loadGame([4, 4]));
-    btn_45.addEventListener('click', () => loadGame([4, 5]));
-    btn_54.addEventListener('click', () => loadGame([5, 4]));
-    btn_56.addEventListener('click', () => loadGame([5, 6]));
-    btn_65.addEventListener('click', () => loadGame([6, 5]));
-    btn_66.addEventListener('click', () => loadGame([6, 6]));
+document.addEventListener('DOMContentLoaded', () => {
+    var btnStart = document.getElementById("btnStart");
+    btnStart.addEventListener('click', () => !GAME.state.isLoading && loadGame([4, 4]));
 
     GAME.init();
 

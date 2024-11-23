@@ -20,32 +20,24 @@
     </div>
 
     <header class="wf-header">
-        <button id="btn44">4 x 4</button>
-        <button id="btn45">4 x 5</button>
-        <button id="btn54">5 x 4</button>
-        <button id="btn56">5 x 6</button>
-        <button id="btn65">6 x 5</button>
-        <button id="btn66">6 x 6</button>
+        <button id="btnStart">Start</button>
+        <h2 style="margin: 0; padding: 0;" id="wfClicks">00</h2>
+        <h2 style="margin: 0; padding: 0;" id="wfTimer">00:00:00</h2>
     </header>
 
-    <select name="cars" id="cars">
-        <option value="volvo">Volvo</option>
-        <option value="saab">Saab</option>
-        <option value="mercedes">Mercedes</option>
-        <option value="audi">Audi</option>
-    </select>
 
     <div class="wf-message-container">
         <span id="wfMessage" class="wf-message">
             Let's match the words!
             <br>
-            select grid size to start the game.
+            click start button to start the game.
         </span>
     </div>
 
     <div class="wf-flyword-container">
         <span id="wfFlyword" class="wf-flyword">Well Done!</span>
     </div>
+
 
     <div class="card-container" id="cardContainer">
         <div class="card" data-face="0" onclick="flipCard(this)">
