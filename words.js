@@ -679,13 +679,128 @@ var word_pairs_json = {
     ]
 }
 
+const word_pairs_list = [
+    "Maple Leaf", "Polar Bear", "Pine Tree", "Snow Bank", "Forest Fire", "Wild Goose", "Lake Shore",
+    "River Valley", "Maple Syrup", "Poutine Gravy", "Butter Tart", "Peameal Bacon", "Ice Cream", "Apple Pie",
+    "Salmon Fillet", "Bacon Strip", "Bread Crumb", "Cheese Curds", "Fruit Punch", "Coffee Shop", "Meat Pie",
+    "Hockey Stick", "Ski Jacket", "Snow Shovel", "Log Cabin", "Wool Sweater", "Fire Place", "Front Porch",
+    "Back Yard", "Living Room", "Kitchen Table", "Guest Room", "Lawn Mower", "Garden Hose", "Window Pane",
+    "Door Frame", "Truck Bed", "Pickup Truck", "Train Station", "Bus Stop", "Bike Lane", "Seat Belt",
+    "Road Trip", "Ferry Boat", "Hockey Game", "Ski Resort", "Ice Rink", "Soccer Ball", "Fishing Rod",
+    "Camping Gear", "Hiking Trail", "Gem Stone", "Work Shirt", "Coffee Break", "Lunch Room", "Office Chair",
+    "Team Leader", "Job Search", "Career Path", "True Love", "Family Tree", "Maple Country", "Social Circle",
+    "Friend Group", "Town Hall", "Public Space", "Winter Coat", "Summer Breeze", "Spring Flowers",
+    "Autumn Leaf", "Cold Front", "Snow Storm", "Frost Bite", "Rain Jacket", "Sun Shine", "Cloud Cover",
+    "Tooth Paste", "Hair Brush", "Shoe Lace", "Pillow Case", "Water Bottle", "Lunch Box", "Phone Case",
+    "Bed Sheet", "School Bag", "Gift Wrap", "Frying Pan", "Cutting Board", "Dinner Plate", "Book Shelf",
+    "Picture Frame", "Light Bulb", "Trash Can", "Key Chain", "Maple Crown", "Beaver Tail", "Canuck Pride",
+    "Moose Hide", "Arctic Wind", "Prairie Grass", "Tundra Land", "Coast Guard", "Mountie Hat", "Kraft Dinner",
+    "Caesar Drink", "Nanaimo Bar", "Toronto Maple", "Quebec City", "Ottawa River", "Yukon Gold",
+    "Regina Plains", "Wild Rice", "Arctic Fox", "Salmon Run", "Berry Patch", "Canoe Trip", "Wood Stove",
+    "Fishing Boat", "River Bank", "Forest Trail", "Snow Bird", "Cabin Life", "Ice Field", "Winter Gear",
+    "Snow Plow", "Moose Tracks", "Coffee Mug", "Skating Rink", "Canoe Paddle", "Loon Call", "Bear Cub",
+    "Camp Fire", "Snow Globe", "Ice Cap", "Cold Snap", "Trail Mix", "Tree Line", "Cabin Fever",
+    "Moose Antler", "Pine Cone", "Bird Feeder", "Deer Trail", "Snow Drift", "Spring Thaw", "Ice Skates",
+    "Rain Shower", "Winter Chill", "Sugar Shack", "Cabin Window", "Maple Candy", "Wood Pile", "Cedar Plank",
+    "Park Bench", "Trail Marker", "Berry Picking", "Nature Walk", "City Lights", "Bike Path", "Rain Boots",
+    "Fishing Hole", "Ski Poles", "Lodge Door", "Storm Cloud", "Tree Bark", "Camping Chair", "Snow Boots",
+    "Ice Water", "Wild Flowers", "Trail Blazer", "Lake Water", "River Otter", "Wolf Pack", "River Rapids",
+    "Timber Wolf", "Ice Crystal", "Bear Hug", "Fishing Line", "Wild Stream", "Maple Woods", "Hiking Boots",
+    "Berry Bush", "Tree House", "Frozen Lake", "Snow Fall", "Camp Site", "Forest Ranger", "Log Bridge",
+    "Ski Lodge", "Spring Water", "Snow Shoes", "Rain Coat", "Cloud Burst", "Forest Canopy", "Lodge Fire",
+    "Wild Trail", "Tree Top", "Lake Ice", "Fishing Camp", "Hiking Path", "Snow Ice", "Spring Rain",
+    "Canoe Ride", "Maple Butter", "Sugar Bush", "Deer Creek", "Frozen Creek", "Nature Reserve", "Snow Board",
+    "Ice Hotel", "Tree Stand", "Cabin Door", "Canoe Club", "Rock Garden", "Trail Ridge", "Lake Breeze",
+    "Fishing Dock", "Ice Breaker", "Rain Forest", "Glacier Ice", "Cold Lake", "Snow Blanket", "Rain Shadow",
+    "Snow Crunch", "Forest Lake", "Tree Branch", "Ice Jam", "Storm Front", "Cloud Layer", "Ski Slope",
+    "Bear Trail", "Berry Field", "Snow Cabin", "Ice Drift", "Lake View", "Forest View", "Pine Needle",
+    "Cedar Tree", "Spruce Tree", "Hiking Stick", "Bird House", "Moose Lodge", "Forest Glade", "Cabin Roof",
+    "Hiking Ridge", "Cloud Cliff", "Rain Drop", "River View", "Frozen Pond", "Nature Center", "Ice Path",
+    "Snow Cap", "Moose Meadow", "Maple Sap", "Wild Berry", "Cold Night", "Winter Freeze", "Ice Cup",
+    "Log Wall", "Trail Hiker", "Rain Puddle", "Storm Drain", "Lake House", "Canoe Dock", "Berry Basket",
+    "Tree Ring", "Deer Herd", "Wood Chip", "Snow Crystal", "Ice Lantern", "Forest Shadow", "Trail Fire",
+    "Fishing Spot", "Cabin Porch", "Snow Trail", "Frost Flower", "River Stream", "Cloud Stream",
+    "Trail Shelter", "Frozen Trail", "Hiking Camp", "Lake Cabin", "Pine Forest", "Bird Nest", "Cedar Log",
+    "Winter Scarf", "Maple Shade", "Snow Forest", "Fishing Hut", "Wild Creek", "Tree Shelter", "Wood Trail",
+    "Bear Forest", "Snow Wolf", "Ice Cave", "Spring Meadow", "Trail Hut", "Fishing Fly", "Moose Call",
+    "Lake Trail", "Forest Snow", "Ice Shack", "River Cliff", "Nature Lodge", "Winter Night", "Fishing Stream",
+    "Snow Ridge", "Camp Chair", "Trail Map", "Fishing Pole", "Wild Woods", "River Drift", "Rain Drizzle",
+    "Nature Spot", "Ice Walk", "Forest Lodge", "Cabin View", "Moose Creek", "Snow Lodge", "Cedar Shelter",
+    "Great Lakes", "Arctic Circle", "Pacific Coast", "Maple Forest", "Boreal Forest", "Ice Storm",
+    "Wind Chill", "Snow Tire", "Hockey Night", "Tim Hortons", "First Nations", "French Quarter",
+    "Trading Post", "Hockey Jersey", "Maple Donut", "Cheese Curd", "Beer Store", "Wild Salmon",
+    "Bannock Bread", "Ice Cider", "Hard Luck", "Cold Beer", "Ski Doo", "True North", "Good Luck",
+    "Long Weekend", "Beer Fridge", "Kitchen Party", "Black Bear", "Grizzly Bear", "Bald Eagle", "Wild Moose",
+    "Birch Tree", "Wild Berries", "Curling Rink", "Camping Ground", "Hunting Gear", "Fishing Vest",
+    "Ski Lift", "Oil Patch", "Mining Town", "Lumber Mill", "Factory Worker", "Truck Driver", "Paper Mill",
+    "Mining Camp", "Coffee Pot", "Washing Machine", "Dish Soap", "Paper Towel", "Garbage Bag", "Window Frame",
+    "Double Double", "Green Card", "Phone Booth", "Postal Code", "Rush Hour", "Fire Station",
+    "Police Station", "Parking Lot", "Winter Gloves", "Wool Socks", "Fleece Jacket", "Ice Scraper",
+    "Heated Blanket", "Winter Hat", "Canyon View", "Cliff Edge", "Senior Center", "Public Library",
+    "School Board", "Food Bank", "Health Card", "Medical Center", "Dental Clinic", "Blood Test", "Flu Shot",
+    "First Aid", "Urgent Care", "Medical Exam", "Hearing Test", "Eye Doctor", "High School", "Trade School",
+    "School Bus", "Science Fair", "Book Store", "Study Group", "Bus Station", "Airport Shuttle", "Taxi Stand",
+    "Parking Meter", "Ferry Ride", "Highway Sign", "Road Map", "Travel Bag", "Best Friend", "Family Dinner",
+    "Dinner Date", "Family Member", "Wedding Day", "Instant Replay", "Cargo Hold", "Parking Brake",
+    "Driving Licence", "Grocery Store", "Corner Store", "Hockey Puck", "Goalie Mask", "Bicycle Lane",
+    "Logging Road", "Lumber Jack", "Car Pool", "Bus Route", "Paper Route", "Grocery Bag", "Bike Rack",
+    "Street Light", "Beer Mug", "Camping Tent", "Fish Hook", "Moose Antlers", "Canada Goose", "Bear Claw",
+    "Storm Warning", "Travel Guide", "Camping Trip", "Holiday Card", "Winter Storm", "Summer Camp",
+    "Rock Climber", "Cozy Blanket", "Fire Pit", "Family Day", "Country Road", "Ice Fishing", "City Hall",
+    "Post Office", "Street Hockey", "Blue Jays", "Prairie Dog", "Fishing License", "Loon Dollar",
+    "Gas Station", "Beach Towel", "Fall Leaves", "Public Park", "Spring Break", "Harvest Season",
+    "Hockey Rink", "Dog Sled", "Fire Truck", "Boat Dock", "Traffic Light", "Summer Cottage", "Ski Pole",
+    "Sleigh Ride", "Coastal City", "Ice Patch", "Loon Lake", "Cross Country", "Snow Blower", "Hockey Helmet",
+    "Cedar Wood", "Maple Cream", "Fishing Net", "Rushing River", "Summer Picnic", "Camping Stove",
+    "Autumn Harvest", "Cabin Woods", "Trail Runner", "Maple Grove", "Boreal Trail", "Hiking Gear",
+    "Frost Warning", "Scenic Highway", "Fishing Trip", "Coastal Trail", "Skating Pond", "Forest Path",
+    "Bear Den", "Storm Watch", "Ice Road", "Boreal Woods", "Cozy Cabin", "Frozen River", "Maple Cookie",
+    "Trail Hike", "Hockey Player", "Bear Paw", "Winter Boots", "Loon Song", "Ski Chalet", "Winter Lodge",
+    "Ice Climber", "Hockey Arena", "Camping Lantern", "Ice Sheet", "Snow Day", "Holiday Spirit",
+    "Cabin Rental", "Coastal Village", "Winter Cabin", "Maple Tree", "Ice Pack", "Holiday Dinner",
+    "Storm Shelter", "Fishing Bait", "Forest Camp", "Trail Guide", "Bear Tracks", "Fishing Hook",
+    "Forest Haven", "Dining Table", "Garbage Truck", "Tire Shop", "Bottle Opener", "Pizza Slice",
+    "Laundry Soap", "Potato Chip", "Bike Ride", "Wind Shield", "Home Phone", "Cell Phone", "Work Boots",
+    "Hot Plate", "Oven Mitt", "Wash Cloth", "Deck Chair", "Wind Storm", "Mail Box", "Tea Bag", "Chop Stick",
+    "Patio Door", "Screen Door", "Dish Rack", "Soap Dish", "Wine Glass", "Truck Tire", "Door Bell",
+    "Camp Ground", "Food Court", "Salt Shaker", "Pepper Mill", "Juice Box", "Game Night", "Store Front",
+    "Coat Rack", "Chair Lift", "Road Side", "Plow Truck", "News Stand", "Bar Stool", "Power Cord",
+    "Shoe Store", "Radio Station", "Car Wash", "Toll Bridge", "Head Lamp", "Work Bench", "Chair Back",
+    "Table Lamp", "Wall Clock", "Bread Knife", "Poster Board", "Bus Fare", "Pizza Oven", "Milk Shake",
+    "Wash Room", "Rest Room", "Drink Mix", "Fish Cake", "Stir Fry", "Potato Salad", "Salad Bar",
+    "Drink Stand", "Phone Book", "Note Book", "Cook Book", "Log Book", "Hockey Gear", "Ski Gear", "Work Gear",
+    "Spot Light", "Stop Sign", "Birth Place", "Cherry Pie", "Berry Farm", "Dairy Farm", "Corn Field",
+    "Wheat Field", "Fire Wood", "Hand Cream", "Face Cream", "Skin Cream", "Shaving Cream", "Tooth Brush",
+    "Tooth Pick", "Shoe Horn", "Hair Cut", "Nail File", "Cup Board", "News Paper", "Food Truck", "Lunch Bag",
+    "Pie Plate", "Cake Pan", "Sauce Pan", "Hot Dog", "Soft Drink", "Tea Pot", "Pot Holder", "Dish Cloth",
+    "Bank Card", "Credit Card", "Post Card", "Note Card", "Coat Hook", "Coat Hanger", "Bus Lane",
+    "Winter Tire", "Tennis Court", "Basket Ball", "Dress Shirt", "Sport Coat", "Dust Cloth", "Floor Mop",
+    "Dust Pan", "Dust Mop", "Mail Bag", "Trash Bag", "Bread Bag", "Wash Basin", "Dish Basin", "Bird Bath",
+    "Bath Mat", "Bath Towel", "Hair Spray", "After Shave", "Sun Screen", "Bike Trip", "Ski Trip",
+    "Work Shift", "Night Shift", "Bank Note", "Note Pad", "Story Book", "Game Room", "Dining Room",
+    "Soup Bowl", "Mixing Bowl", "Salad Bowl", "Sand Box", "Tool Box", "Bread Box", "Shoe Box", "Cake Mix",
+    "Soup Mix", "Back Porch", "Wood Deck", "Side Walk", "Park Path", "Road Block", "Bank Account",
+    "Lawn Chair", "Beach Chair", "Ball Game", "Card Game", "Food Chain", "Drug Store", "Bike Shop",
+    "Book Shop", "Green House", "Ice House", "Boat House", "Truck Stop", "Train Stop", "Beach Line",
+    "Horse Power", "Engine Block", "Traffic Jam", "School Yard", "Play Ground", "Ocean View", "Golf Course",
+    "Tax Form", "Meal Ticket", "Parking Ticket", "Bus Ticket", "Mail Room", "Break Room", "Pot Luck",
+    "Police Car", "Drink Mixer", "Rest Area", "View Point", "Stop Light"
+];
+
 console.log(word_pairs_json.words.length);
+console.log(word_pairs_list.length);
 
-const wset = new Set();
-
+let wset = new Set();
 word_pairs_json.words.forEach((w) => {
     const p = w.split(' ');
     if (p.length === 2 && p[0].length < 9 && p[1].length < 9)
+        wset.add(w);
+});
+
+wset = new Set();
+word_pairs_list.forEach((w) => {
+    const p = w.split(' ');
+    if (p.length === 2 && p[0].length < 8 && p[1].length < 8)
         wset.add(w);
 });
 
@@ -702,3 +817,5 @@ var word_pairs_json = {
         "Tooth Paste", "True Love", "Coffee Mug", "Dinner Table", "Bed Sheet",
         "Trash Can", "Washing Machine", "Dining Room", "Kitchen Sink", "Shower Head"]
 }
+
+

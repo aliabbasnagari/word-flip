@@ -23,7 +23,7 @@ var GAME = {
     },
     values: {
         API_URL: "https://mytoronto.thedev.ca/wp-json/words/v1/random-words/?count=8",
-        ANIM_DURATION: 2000,
+        ANIM_DURATION: 1900,
     },
     timer: {
         stopwatchInterval: null,
@@ -99,7 +99,6 @@ var GAME = {
 
             console.log(this.state.WORD_PAIRS);
 
-            this.elements.messageSpan.innerHTML = `score <h2>0</h2>`;
             // const words = shuffle(this.state.WORD_PAIRS.flatMap(item => item.split(" ")));
             const words = this.state.WORD_PAIRS.flatMap(item => item.split(" "));
             console.log(words);
@@ -107,10 +106,20 @@ var GAME = {
                 fragment.appendChild(createCard(word));
             });
             this.elements.cardContainer.appendChild(fragment);
-            this.elements.messageSpan.innerHTML = `score <h2>0</h2>`;
+            //this.elements.messageSpan.innerHTML = `score <h2>0</h2>`;
+            this.elements.messageSpan.innerHTML = ``;
             this.elements.clicksDisplay.textContent = `Clicks: ${this.state.CLICKS}`;
-            GAME.timer.startStopwatch();
-            this.state.IS_PLAYING = true;
+
+            const fly = document.createElement('span');
+            fly.classList.add('wf-flyword');
+            fly.innerHTML = "Match The Two Word Phrases!";
+            this.elements.flywordSpan.appendChild(fly);
+
+            setTimeout(() => {
+                this.elements.flywordSpan.removeChild(fly);
+                GAME.timer.startStopwatch();
+                this.state.IS_PLAYING = true;
+            }, this.values.ANIM_DURATION);
         }).catch(error => {
             console.error(error);
             this.elements.messageSpan.innerHTML = `<h3>Error: ${error.message}</h3>`;
@@ -152,11 +161,8 @@ var GAME = {
                     const points = this.calculatePoints(currClicks, currTime);
                     this.state.SCORE += points;
 
-                    const fly = document.createElement('span');
-                    fly.classList.add('wf-flyword');
-                    fly.innerHTML = pair;
-                    this.elements.flywordSpan.appendChild(fly);
-                    animateCounter(this.elements.messageSpan, this.state.SCORE - points, this.state.SCORE, 1000);
+                    //animateCounter(this.elements.messageSpan, this.state.SCORE - points, this.state.SCORE, 1000);
+                    console.log("Score: ", this.state.SCORE);
 
                     console.log({
                         Points: points,
@@ -181,6 +187,11 @@ var GAME = {
 
                     this.state.ACTIVE_CARDS[0].classList.add("dance");
                     this.state.ACTIVE_CARDS[1].classList.add("dance");
+
+                    const fly = document.createElement('span');
+                    fly.classList.add('wf-flyword');
+                    fly.innerHTML = pair;
+                    this.elements.flywordSpan.appendChild(fly);
 
                     setTimeout(() => {
                         this.elements.flywordSpan.removeChild(fly);
