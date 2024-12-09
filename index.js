@@ -95,7 +95,18 @@ var GAME = {
             return response.json();
         }).then(words_json => {
             const fragment = document.createDocumentFragment();
-            this.state.WORD_PAIRS = words_json.words;
+
+            //this.state.WORD_PAIRS = words_json.words;
+            this.state.WORD_PAIRS = [
+                "MMMMMMM WWWWWWW",
+                "MMMMMMM WWWWWWW",
+                "MMMMMMM WWWWWWW",
+                "MMMMMMM WWWWWWW",
+                "MMMMMMM WWWWWWW",
+                "MMMMMMM WWWWWWW",
+                "MMMMMMM WWWWWWW",
+                "MMMMMMM WWWWWWW"
+            ]
 
             console.log(this.state.WORD_PAIRS);
 
